@@ -1,7 +1,38 @@
 const gameboard = (() => {
-  let boardArray = ['x', 'o', 'x', 'o', 'x', 'o', 'x', 'o', 'x'];
+  let boardArray = [null, null, null, null, null, null, null, null, null];
   const getTile = (i) => boardArray[i];
-  return { getTile };
+  const setTile = (i, symbol) => boardArray[i] = symbol;
+  return { getTile, setTile, boardArray };
+})();
+
+const Player = (s) => {
+  let symbol = s;
+
+  return { symbol };
+}
+
+const gameManager = (() => {
+
+  const player1 = Player('x');
+  const player2 = Player('o');
+  let activePlayer = player1;
+
+  const switchPlayer = () => {
+    if (activePlayer === player1) {
+      activePlayer = player2;
+    } else {
+      activePlayer = player1;
+    }
+  }
+
+  const selectTile = (e) => {
+    if (gameboard.getTile(e.currentTarget.num) === null) {
+      gameboard.setTile(e.currentTarget.num, activePlayer.symbol)
+      switchPlayer();
+    }
+  }
+
+  return { selectTile};
 })();
 
 const displayController = (() => {
@@ -25,7 +56,12 @@ const displayController = (() => {
     }
   }
 
+  for (let i = 0; i < 9; i++) {
+    const tileNode = document.querySelector(`.board div:nth-child(${i+1})`);
+    tileNode.num = i;
+    tileNode.addEventListener('click', gameManager.selectTile);
+    tileNode.addEventListener('click', update);
+  }
+
   return { update };
 })();
-
-displayController.update();
